@@ -1,37 +1,128 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Jack Edwards | Portfolio</title>
+  <meta name="description" content="Portfolio of Jack Edwards — Meteorology, Data Analysis, GIS, and risk-focused projects." />
+  <link rel="icon" href="assets/favicon.png">
   <style>
-    body { font-family: Arial, sans-serif; margin: 40px; line-height: 1.6; }
-    h1 { color: #002B5B; }
-    h2 { color: #555; }
-    a { color: #0066cc; text-decoration: none; }
-    a:hover { text-decoration: underline; }
+    :root{
+      --bg:#0b1220; --card:#0f172a; --muted:#94a3b8; --text:#e6edf6; --accent:#60a5fa; --chip:#1e293b;
+    }
+    *{box-sizing:border-box}
+    body{margin:0; font-family:ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif; background:var(--bg); color:var(--text);}
+    .wrap{max-width:1100px; margin:0 auto; padding:28px 18px 80px;}
+    header{display:flex; flex-wrap:wrap; align-items:flex-end; gap:18px; margin:10px 0 26px;}
+    .title{font-size:clamp(28px,4vw,42px); font-weight:700; letter-spacing:.3px;}
+    .subtitle{color:var(--muted); font-size:clamp(14px,2vw,18px); margin-top:4px}
+    nav{margin-left:auto; display:flex; gap:12px; flex-wrap:wrap}
+    .btn{display:inline-flex; align-items:center; gap:8px; background:var(--card); color:var(--text); padding:10px 14px; border-radius:12px; text-decoration:none; border:1px solid #1f2937}
+    .btn:hover{outline:2px solid #334155}
+    .hero{background:linear-gradient(180deg, rgba(96,165,250,.12), transparent 60%); border:1px solid #1f2937; border-radius:18px; padding:20px; margin:10px 0 26px;}
+    .hero p{margin:6px 0 0; color:var(--muted); max-width:70ch}
+    h2{margin:28px 0 14px; font-size:22px}
+    .grid{display:grid; grid-template-columns:repeat(1,minmax(0,1fr)); gap:16px}
+    @media(min-width:720px){.grid{grid-template-columns:repeat(2,minmax(0,1fr));}}
+    @media(min-width:1024px){.grid{grid-template-columns:repeat(3,minmax(0,1fr));}}
+    .card{background:var(--card); border:1px solid #1f2937; border-radius:16px; overflow:hidden; display:flex; flex-direction:column; min-height:260px}
+    .thumb{aspect-ratio:16/9; background:#0b1220; display:flex; align-items:center; justify-content:center; color:var(--muted); font-size:14px}
+    .thumb img{width:100%; height:100%; object-fit:cover}
+    .content{padding:14px 14px 16px}
+    .kicker{color:var(--accent); font-size:12px; letter-spacing:.3px; text-transform:uppercase}
+    .heading{margin:6px 0 6px; font-size:18px; font-weight:600}
+    .desc{color:var(--muted); font-size:14px; line-height:1.45}
+    .chips{display:flex; flex-wrap:wrap; gap:8px; margin-top:10px}
+    .chip{font-size:12px; padding:6px 10px; background:var(--chip); border:1px solid #263246; border-radius:999px; color:#cbd5e1}
+    .card a.cta{margin-top:auto; display:block; padding:12px 14px; text-decoration:none; color:#cfe6ff; border-top:1px solid #1f2937}
+    footer{margin-top:36px; color:var(--muted); font-size:13px}
+    .links{display:flex; gap:14px; flex-wrap:wrap}
+    a{color:#9ecbff}
+    a:hover{text-decoration:underline}
   </style>
 </head>
 <body>
-  <h1>Jack Edwards</h1>
-  <h2>Meteorology • Data Analysis • GIS</h2>
-  <p>Welcome to my portfolio. Below are links to selected projects and materials hosted in this repository.</p>
+  <div class="wrap">
+    <header>
+      <div>
+        <div class="title">Jack Edwards</div>
+        <div class="subtitle">Meteorology • Data Analysis • GIS • Risk Modeling</div>
+      </div>
+      <nav>
+        <a class="btn" href="Jack_Edwards_Resume.pdf" target="_blank" rel="noopener">Resume (PDF)</a>
+        <a class="btn" href="https://www.linkedin.com/in/jack-r-edwards" target="_blank" rel="noopener">LinkedIn</a>
+        <a class="btn" href="https://github.com/jack-r-edwards" target="_blank" rel="noopener">GitHub</a>
+        <!-- Optional: Notion hub -->
+        <!-- <a class="btn" href="https://www.notion.so/your-portfolio-link" target="_blank" rel="noopener">Portfolio Hub</a> -->
+      </nav>
+    </header>
 
-  <h3>Featured Projects</h3>
-  <ul>
-    <li><a href="https://github.com/jack-r-edwards/ASE_Wind_Alert_Dashboard">ASE Wind Alert Dashboard</a></li>
-    <li><a href="https://github.com/jack-r-edwards/Orchid_Tent_Controller">Orchid Tent Automation System</a></li>
-    <li><a href="https://github.com/jack-r-edwards/GIS_Flood_Modeling">Flood Susceptibility Mapping (GIS)</a></li>
-  </ul>
+    <section class="hero">
+      <p>I translate environmental data into decisions. My recent work spans operational aviation forecasting, Python automation, and GIS mapping for risk and accessibility. Below are selected projects; each repo includes code, a short README, and PDFs or visuals.</p>
+    </section>
 
-  <h3>Resume</h3>
-  <p><a href="Jack_Edwards_Resume.pdf">Download Resume (PDF)</a></p>
+    <h2>Featured Projects</h2>
+    <section class="grid">
+      <!-- Project 1 -->
+      <article class="card">
+        <div class="thumb">
+          <!-- Replace with a real screenshot in /assets -->
+          <img src="assets/ase-wind.png" alt="ASE Wind Alert Dashboard screenshot" onerror="this.parentElement.textContent='Screenshot coming soon';">
+        </div>
+        <div class="content">
+          <div class="kicker">Python • Power BI</div>
+          <div class="heading">ASE Wind Alert Dashboard</div>
+          <p class="desc">Automates METAR checks around Aspen (ASE), flags wind ≥12 kts, and feeds a Power BI view for dispatch-ready alerts. Optional perimeter expansion for K5SM and GJT.</p>
+          <div class="chips">
+            <span class="chip">requests</span><span class="chip">pandas</span><span class="chip">GIS perimeter</span>
+          </div>
+        </div>
+        <a class="cta" href="https://github.com/jack-r-edwards/ASE_Wind_Alert_Dashboard" target="_blank" rel="noopener">View repository →</a>
+      </article>
 
-  <h3>Contact</h3>
-  <p>
-    📍 Cleveland, OH <br>
-    ✉️ <a href="mailto:jackedwards@email.com">jackedwards@email.com</a> <br>
-    🌐 <a href="https://www.linkedin.com/in/jack-r-edwards">LinkedIn Profile</a>
-  </p>
+      <!-- Project 2 -->
+      <article class="card">
+        <div class="thumb">
+          <img src="assets/barrow-park.png" alt="Barrow County Park Location Analysis map" onerror="this.parentElement.textContent='Screenshot coming soon';">
+        </div>
+        <div class="content">
+          <div class="kicker">ArcGIS Pro</div>
+          <div class="heading">Park Location Suitability — Barrow County, GA</div>
+          <p class="desc">Spatial suitability analysis to identify first, second, and third-choice block groups for new parks using demographics and accessibility layers.</p>
+          <div class="chips">
+            <span class="chip">ArcGIS Pro</span><span class="chip">Census TIGER</span><span class="chip">Cartography</span>
+          </div>
+        </div>
+        <!-- Link to the image/PDF in your repo or the project repo -->
+        <a class="cta" href="projects/barrow-county-park/Barrow_Park_Analysis.pdf" target="_blank" rel="noopener">Open map/report →</a>
+      </article>
+
+      <!-- Project 3 -->
+      <article class="card">
+        <div class="thumb">
+          <img src="assets/orchid-tent.png" alt="Orchid Tent Controller visualization" onerror="this.parentElement.textContent='Screenshot coming soon';">
+        </div>
+        <div class="content">
+          <div class="kicker">Python • IoT</div>
+          <div class="heading">Orchid Tent Automation</div>
+          <p class="desc">Control loop for humidity and light using a common RH sensor and lux meter, with threshold-based actuation and logging for tuning.</p>
+          <div class="chips">
+            <span class="chip">sensors</span><span class="chip">control logic</span><span class="chip">logging</span>
+          </div>
+        </div>
+        <a class="cta" href="https://github.com/jack-r-edwards/Orchid_Tent_Controller" target="_blank" rel="noopener">View repository →</a>
+      </article>
+    </section>
+
+    <footer>
+      <div class="links">
+        <span>© <script>document.write(new Date().getFullYear())</script> Jack Edwards</span>
+        <span>•</span>
+        <a href="mailto:jack.edwards@email.com">Email</a>
+        <span>•</span>
+        <a href="Jack_Edwards_Resume.pdf" target="_blank" rel="noopener">Download Résumé</a>
+      </div>
+    </footer>
+  </div>
 </body>
 </html>
