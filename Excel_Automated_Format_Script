@@ -1,0 +1,181 @@
+function main(workbook: ExcelScript.Workbook) {
+
+    const sheet = workbook.getActiveWorksheet();
+
+    const DATA_BG_COLOR = "#CAC3A2"; // Background color for data rows
+
+ 
+
+    // NEW PHASE: Delete top 6 rows
+
+    sheet.getRange("1:6").delete(ExcelScript.DeleteShiftDirection.up);
+
+ 
+
+    // PHASE 0: Delete specified columns (right to left)
+
+    const columnsToDelete = ["B", "I", "L", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X"];
+
+    for (let i = columnsToDelete.length - 1; i >= 0; i--) {
+
+        const columnLetter = columnsToDelete[i];
+
+        const columnNumber = columnLetter.charCodeAt(0) - 65; // A=0, B=1, etc.
+
+        sheet.getRangeByIndexes(0, columnNumber, sheet.getUsedRange().getRowCount(), 1)
+
+            .delete(ExcelScript.DeleteShiftDirection.left);
+
+    }
+
+ 
+
+    // PHASE 1: Set all cells to white background
+
+    const fullRange = sheet.getUsedRange();
+
+    fullRange.getFormat().getFill().setColor("#FFFFFF");
+
+ 
+
+    // PHASE 2: Format header row (row 1) - light grey, bold, and underlined
+
+    const headerRow = sheet.getRange("1:1");
+
+    const headerFormat = headerRow.getFormat();
+
+    headerFormat.getFill().setColor("#F2F2F2");
+
+    headerFormat.getFont().setBold(true);
+
+    headerFormat.getFont().setUnderline(ExcelScript.RangeUnderlineStyle.single);
+
+ 
+
+    // PHASE 3: Insert 3 blank rows under each data row
+
+    const lastRow = fullRange.getLastRow().getRowIndex();
+
+    for (let i = lastRow; i >= 2; i--) {
+
+        const insertPosition = i + 1;
+
+        for (let j = 0; j < 3; j++) {
+
+            sheet.getRange(`${insertPosition}:${insertPosition}`)
+
+                .insert(ExcelScript.InsertShiftDirection.down);
+
+        }
+
+        sheet.getRange(`${i + 1}:${i + 3}`).getFormat().getFill().setColor("#FFFFFF");
+
+    }
+
+ 
+
+    // PHASE 4: Add labels (without merging column A with other columns)
+
+    const newLastRow = sheet.getUsedRange().getLastRow().getRowIndex();
+
+ 
+
+    for (let row = 3; row <= newLastRow; row += 4) {
+
+        // POD Notes (A3, A7, A11...)
+
+        const podCell = sheet.getRange(`A${row}`);
+
+        podCell.setValue("POD Notes");
+
+        podCell.getFormat().getFont().setBold(true);
+
+ 
+
+        // POA Notes (A4, A8, A12...)
+
+        const poaCell = sheet.getRange(`A${row + 1}`);
+
+        poaCell.setValue("POA Notes");
+
+        poaCell.getFormat().getFont().setBold(true);
+
+ 
+
+        // Recommendations (A5, A9, A13...)
+
+        const notesCell = sheet.getRange(`A${row + 2}`);
+
+        notesCell.setValue("Notes/Recommendations");
+
+        notesCell.getFormat().getFont().setBold(true);
+
+ 
+
+        // Merge only columns B-J for each note row
+
+        sheet.getRange(`B${row}:J${row}`).merge();
+
+        sheet.getRange(`B${row + 1}:J${row + 1}`).merge();
+
+        sheet.getRange(`B${row + 2}:J${row + 2}`).merge();
+
+    }
+
+ 
+
+    // PHASE 5: Format data rows (2, 6, 10, 14, etc.)
+
+    for (let dataRow = 2; dataRow <= newLastRow; dataRow += 4) {
+
+        const dataRange = sheet.getRange(`A${dataRow}:J${dataRow}`);
+
+        dataRange.getFormat().getFont().setBold(true);
+
+        dataRange.getFormat().getFill().setColor(DATA_BG_COLOR);
+
+    }
+
+ 
+
+    // PHASE 6: Apply borders to all cells
+
+    const borderRange = sheet.getRange(`A1:J${newLastRow}`);
+
+    const format = borderRange.getFormat();
+
+ 
+
+    // Set all borders (edges and inside)
+
+    format.getRangeBorder(ExcelScript.BorderIndex.edgeTop).setStyle("Continuous");
+
+    format.getRangeBorder(ExcelScript.BorderIndex.edgeBottom).setStyle("Continuous");
+
+    format.getRangeBorder(ExcelScript.BorderIndex.edgeLeft).setStyle("Continuous");
+
+    format.getRangeBorder(ExcelScript.BorderIndex.edgeRight).setStyle("Continuous");
+
+    format.getRangeBorder(ExcelScript.BorderIndex.insideHorizontal).setStyle("Continuous");
+
+    format.getRangeBorder(ExcelScript.BorderIndex.insideVertical).setStyle("Continuous");
+
+ 
+
+    // PHASE 7: Auto-fit columns A-J
+
+    for (let col = 0; col <= 9; col++) { // Columns A-J (0-9)
+
+        sheet.getRangeByIndexes(0, col, newLastRow + 1, 1).getFormat().autofitColumns();
+
+    }
+
+ 
+
+    console.log("Completed: Top 6 rows deleted and all formatting applied");
+
+}
+
+ 
+
+ 
