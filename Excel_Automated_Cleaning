@@ -1,0 +1,153 @@
+function main(workbook: ExcelScript.Workbook) {
+  const sheet = workbook.getActiveWorksheet();
+
+  // ===== Config =====
+  const DATA_RANGE_A_TO_L = "A:L";
+  const K_COL = "K";
+  const L_COL = "L";
+  const M_COL = "M";
+
+  // Helper to refresh used range safely
+  const getLastRowIdx = (): number => {
+    const used = sheet.getUsedRange();
+    return used ? used.getLastRow().getRowIndex() : 0; // 0-based row index
+  };
+
+  // ===== Step 1: Delete the top 4 rows =====
+  // (Trims preface rows so header moves to row 1)
+  const usedInit = sheet.getUsedRange();
+  if (!usedInit) {
+    console.log("Sheet is empty. Nothing to do.");
+    return;
+  }
+  sheet.getRange("1:4").delete(ExcelScript.DeleteShiftDirection.up);
+
+  // ===== Step 2: Delete the bottom row (after the top-trim) =====
+  // Use lastRowIdx for accuracy instead of rowCount-based math.
+  let lastRowIdx = getLastRowIdx(); // 0-based
+  if (lastRowIdx >= 1) {
+    // We have at least header + one data row
+    const lastRow1Based = lastRowIdx + 1;
+    sheet.getRange(`A${lastRow1Based}:L${lastRow1Based}`)
+         .delete(ExcelScript.DeleteShiftDirection.up);
+  }
+
+  // Refresh after deletion
+  lastRowIdx = getLastRowIdx();
+  if (lastRowIdx < 1) {
+    console.log("No data rows after initial trims.");
+    return;
+  }
+
+  // ===== Step 3: Rename headers K1 and L1 =====
+  sheet.getRange(`${K_COL}1`).setValue("POD Temp");
+  sheet.getRange(`${L_COL}1`).setValue("POD APR Notes");
+
+  // ===== Step 4: Sort by Column K (ascending) =====
+  // Sort the data block A2:L(last)
+  let lastRow1Based = lastRowIdx + 1;
+  if (lastRow1Based > 2) {
+    const dataBlock = sheet.getRange(`A2:L${lastRow1Based}`);
+    // key is 0-based relative to the dataBlock; A=0 ... K=10
+    dataBlock.getSort().apply([{ key: 10, ascending: true }]);
+  }
+
+  // ===== Step 5: Delete rows where column K is 0 or 0.00 =====
+  // We’ll scan K2:K(last) once and delete offending rows from bottom to top.
+  const kRange = sheet.getRange(`${K_COL}2:${K_COL}${lastRow1Based}`);
+  const kValues = kRange.getValues() as unknown[][];
+
+  // Build a list of 1-based row numbers to delete
+  const rowsToDeleteK: number[] = [];
+  for (let i = 0; i < kValues.length; i++) {
+    const v = kValues[i][0];
+    const n = typeof v === "number" ? v : parseFloat(String(v));
+    if (!Number.isNaN(n) && (n === 0 || n === 0.0)) {
+      const row1Based = 2 + i;
+      rowsToDeleteK.push(row1Based);
+    }
+  }
+
+  // Delete bottom-up to avoid shifting
+  for (let i = rowsToDeleteK.length - 1; i >= 0; i--) {
+    const r = rowsToDeleteK[i];
+    sheet.getRange(`A${r}:L${r}`).delete(ExcelScript.DeleteShiftDirection.up);
+  }
+
+  // ===== Step 6: Delete rows with "Repositions" or "FLTOP" anywhere =====
+  // Re-scan used range after deletions; read all texts once for speed.
+  lastRowIdx = getLastRowIdx();
+  lastRow1Based = lastRowIdx + 1;
+  if (lastRow1Based < 2) {
+    console.log("No data left after K=0 pruning.");
+    return;
+  }
+
+  const tableRange = sheet.getRange(`A1:L${lastRow1Based}`);
+  const texts = tableRange.getTexts(); // matrix of strings
+  const rowsToDeleteFlags: boolean[] = new Array(lastRow1Based + 1).fill(false);
+
+  const BAD_MATCHES = new Set(["REPOSITIONS", "FLTOP"]);
+
+  // Start from row 2 (skip headers at row 1)
+  for (let r = 2; r <= lastRow1Based; r++) {
+    const rowIdx0 = r - 1; // 0-based for the texts matrix
+    const rowTexts = texts[rowIdx0];
+    const hit = rowTexts.some(cell =>
+      cell && BAD_MATCHES.has(cell.toString().trim().toUpperCase())
+    );
+    if (hit) rowsToDeleteFlags[r] = true;
+  }
+
+  // Delete bottom-up where flagged
+  for (let r = lastRow1Based; r >= 2; r--) {
+    if (rowsToDeleteFlags[r]) {
+      sheet.getRange(`A${r}:L${r}`).delete(ExcelScript.DeleteShiftDirection.up);
+    }
+  }
+
+  // ===== Step 7: Clear contents below K1 and L1 =====
+  lastRowIdx = getLastRowIdx();
+  lastRow1Based = lastRowIdx + 1;
+  if (lastRow1Based >= 2) {
+    sheet.getRange(`${K_COL}2:${K_COL}${lastRow1Based}`)
+         .clear(ExcelScript.ClearApplyTo.contents);
+    sheet.getRange(`${L_COL}2:${L_COL}${lastRow1Based`)
+         .clear(ExcelScript.ClearApplyTo.contents);
+  }
+
+  // ===== Step 8: Convert Column F to ISO UTC in column M (bulk) =====
+  // Header
+  sheet.getRange(`${M_COL}1`).setValue("POD ISO UTC");
+
+  // Read F2:F(last) as text once, parse, and write M2:M(last) in bulk.
+  if (lastRow1Based >= 2) {
+    const fRange = sheet.getRange(`F2:F${lastRow1Based}`);
+    const fTexts = fRange.getTexts(); // matrix of strings
+    const out: string[][] = new Array(fTexts.length)
+      .fill(null)
+      .map(() => [""]);
+
+    for (let i = 0; i < fTexts.length; i++) {
+      const cellText = (fTexts[i][0] || "").trim();
+      if (cellText) {
+        const parsed = new Date(cellText);
+        if (!isNaN(parsed.getTime())) {
+          const y = parsed.getUTCFullYear();
+          const m = String(parsed.getUTCMonth() + 1).padStart(2, "0");
+          const d = String(parsed.getUTCDate()).padStart(2, "0");
+          const hh = String(parsed.getUTCHours()).padStart(2, "0");
+          const mm = String(parsed.getUTCMinutes()).padStart(2, "0");
+          out[i][0] = `${y}-${m}-${d}T${hh}:${mm}Z`;
+        }
+      }
+    }
+
+    const mRange = sheet.getRange(`M2:M${lastRow1Based}`);
+    // Set number format to Text in one go to preserve ISO strings
+    mRange.setNumberFormat("@");
+    mRange.setValues(out);
+  }
+
+  console.log("Completed: Trimmed, sorted, filtered, cleared K/L, and wrote ISO UTC to column M.");
+}
