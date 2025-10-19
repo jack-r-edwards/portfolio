@@ -12,4 +12,4 @@ I apply coding, visualization, and communication to translate complex environmen
 [📄 View Resume (PDF)](Jack_Edwards_Resume.pdf)
 
 ### Contact
-📍 Cleveland, OH  |  ✉️ jackedwards@email.com  |  [LinkedIn](https://linkedin.com/in/jackedwards)
+📍 Cleveland, OH  |  ✉️ jack.edwards.117@gmail.com  |  [LinkedIn]([hhttps://www.linkedin.com/in/jack-edwards-9a7b23238/])
