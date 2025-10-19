@@ -7,10 +7,10 @@ Sensors:
 
 Notes
 -----
-• Requires I2C enabled (e.g., on Raspberry Pi: raspi-config → Interface Options → I2C)
-• Python dependency: smbus2  (pip install smbus2)
-• GPIO relays optional; simulation mode works without any hardware.
-• If only one sensor is connected, the other can be simulated (see --simulate-lux / --simulate-env).
+I2C enabled (raspi-config → Interface Options → I2C)
+Python dependency: smbus2  (pip install smbus2)
+GPIO relays optional, simulation mode works without any hardware
+If only one sensor is connected, the other can be simulated (see --simulate-lux / --simulate-env).
 
 Quick Start
 -----------
@@ -47,7 +47,7 @@ from dataclasses import dataclass, field
 from datetime import datetime, timedelta, time as dtime
 from typing import Optional, Protocol, Tuple
 
-# ========= Configuration =========
+# ------ Configuration -------
 
 LOG_PATH = os.environ.get("ORCHID_LOG_PATH", "orchid_tent_log.csv")
 
@@ -128,7 +128,7 @@ class TimedSwitch:
     def name(self) -> str:
         return self.inner.name
 
-# ========= Simulation Adapters =========
+# --------- Simulation Adapters -----------
 
 class SimSensor:
     def __init__(self):
@@ -153,7 +153,7 @@ class SimSwitch:
     def is_on(self) -> bool: return self._on
     def safe_name(self) -> str: return f"SIM::{self.name}"
 
-# ========= Hardware Adapters (GPIO relays) =========
+# -------- Hardware Adapters (GPIO relays) -----------
 
 HAVE_GPIO = False
 try:
@@ -186,7 +186,7 @@ class GPIOSwitch:
     def safe_name(self) -> str:
         return f"GPIO(pin={self.pin})::{self.name}"
 
-# ========= I2C Sensor Adapters (SHT31 + BH1750) =========
+# ---------- I2C Sensor Adapters (SHT31 + BH1750) -----------
 
 HAVE_SMBUS = False
 try:
